@@ -55,9 +55,13 @@ class ChunkProcessor:
             str(video_path)
         ]
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
             return float(result.stdout.strip())
-        except:
+        except subprocess.TimeoutExpired:
+            logger.error(f"ffprobe timeout for {video_path}")
+            return None
+        except Exception as e:
+            logger.error(f"Error getting duration: {str(e)}")
             return None
     
     def get_available_raw_videos(self) -> List[Path]:
@@ -165,11 +169,15 @@ class ChunkProcessor:
                     str(output_path)
                 ]
             
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            
-            if result.returncode != 0:
-                logger.error(f"FFmpeg error: {result.stderr}")
-                return {"success": False, "message": "Failed to create chunk", "error": result.stderr}
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+                
+                if result.returncode != 0:
+                    logger.error(f"FFmpeg error: {result.stderr}")
+                    return {"success": False, "message": "Failed to create chunk", "error": result.stderr}
+            except subprocess.TimeoutExpired:
+                logger.error(f"FFmpeg timeout after 120s creating chunk from {source_video.name}")
+                return {"success": False, "message": f"FFmpeg timeout creating chunk from {source_video.name}"}
             
             # Update metadata
             self.metadata["chunks"][chunk_id] = {

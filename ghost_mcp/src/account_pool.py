@@ -4,6 +4,7 @@ Simplified account pool management with lazy authentication
 import json
 import os
 import logging
+import random
 from typing import Dict, Optional, List
 from pathlib import Path
 
@@ -23,14 +24,20 @@ class AccountPool:
         # Account management
         self.account_configs: Dict[str, Dict[str, any]] = {}  # Raw credentials
         self.clients: Dict[str, Client] = {}  # Authenticated clients (lazy loaded)
-        self.account_index = 0  # For round-robin rotation
+        self.account_index = 0  # Will be randomized after loading accounts
         
         # Create sessions directory if it doesn't exist
         Path(self.sessions_dir).mkdir(exist_ok=True)
         
         # Load account configurations (but don't authenticate yet)
         self._load_account_configs()
-        logger.info(f"Initialized account pool with {len(self.account_configs)} accounts (lazy authentication)")
+        
+        # Start at a random account to distribute load across restarts
+        if self.account_configs:
+            self.account_index = random.randint(0, len(self.account_configs) - 1)
+            logger.info(f"Initialized account pool with {len(self.account_configs)} accounts, starting at index {self.account_index}")
+        else:
+            logger.info("No accounts loaded in account pool")
     
     def _load_account_configs(self) -> None:
         """Load account configurations without authenticating"""

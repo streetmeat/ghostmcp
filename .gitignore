@@ -157,6 +157,7 @@ datasets/*
 *.orig
 *~
 .DS_Store
+check_emails_api.sh
 
 # Archive directories
 Old/
@@ -179,6 +180,11 @@ cloudflare-worker/.wrangler/
 wrangler.toml
 */wrangler.toml
 !wrangler.toml.example
+cloudflare-worker/utils
+cloudflare-worker/deploy.sh
+cloudflare-worker/setup.sh
+
+
 
 # Configuration files (keep examples)
 config.py

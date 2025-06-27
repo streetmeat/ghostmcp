@@ -3,25 +3,28 @@ _analogue-slop meets Instagram DM MCP_
 
 ### what is it?
  > a two-part experiment for the @galalabs instagram-dm hackathon.  
- > vhs glitch edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at **ghost-vhs.com**.
+ > vhs glitch edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at **vhs-ghost.com**.
 
 ### parts
 1. **ghost-mcp-server**  
  > pulls targets from brightdata  
  > auto-cuts personalised VHS clips  
- > uploads reel + tag & DM with `ghost-vhs.com/<username>`  
+ > uploads reel + tag & DM with `vhs-ghost.com/<username>`  
  > utilises a rotating account pool with proxies  
  > running locally on nvidia jetson nano dev kit
-2. **ghost-vhs.com**  
+2. **vhs-ghost.com**  
  > shows your IG stats with a countdown & email collection form  
  > transitions into an endless feed of vhs clips  
  > cloudflare workers - edge hosted
 
 ### why  
- > fight ai slop with vhs slop, celebrate using the technology & internet for creative expression, fun intro to mcp, take part in a hackathon for the first time
+ > fight ai slop with vhs slop
+ > celebrate using the technology & internet for creative expression
+ > opportunity to get introduced to mcp and hackathons 
 
 ### any "actual" use?   
- > with the smallest amount of creativity this could be used to market a product or service 
+ > with the smallest amount of creativity this could be used to market a product or service
+ > my theory is that combing an obscure vhs clip, editing the actual username, and sending a url with /username it will create enough intrigue for some click through
  
 ### example usage
  > deploy a campagin subagents for  10 random users, create personalized videos for each and dm it to them with a custom urll.

@@ -1,6 +1,6 @@
 # Ghost MCP Server - Complete Guide
 
-A FastMCP-based Instagram automation server for the Ghost Media Haunting Bot. This guide consolidates all documentation for easy reference.
+A FastMCP-based Instagram automation server for the ghost vhs bot. This guide consolidates all documentation for easy reference.
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -16,8 +16,7 @@ A FastMCP-based Instagram automation server for the Ghost Media Haunting Bot. Th
 
 ## Overview
 
-The Ghost MCP Server is a comprehensive Instagram automation platform that enables LLMs to execute viral marketing campaigns through personalized videos and targeted DMs. Built for the Instagram DM MCP Hackathon by Gala Labs (June 2025).
-
+The Ghost MCP Server is a comprehensive Instagram automation platform that enables LLMs to execute viral marketing campaigns through personalized videos and targeted DMs. Built for the Instagram DM MCP Hackathon by Gala Labs.
 ## Features
 
 - 🤖 **Multi-Account Management** - Rotate between accounts with session persistence
@@ -215,7 +214,7 @@ users = mcp__ghost__download_bright_data_snapshot(snapshot_id)
 campaign = mcp__ghost__create_campaign(
     name="ghost_haunting_v1",
     user_list=users["usernames"],
-    message_template="SYSTEM DIAGNOSTIC INITIATED\nACCESS: ghost-vhs.com/{username}\nTIME REMAINING: 72:00:00"
+    message_template="SYSTEM DIAGNOSTIC INITIATED\nACCESS: vhs-ghost.com/{username}\nTIME REMAINING: 72:00:00"
 )
 
 # 4. Prepare videos (optional)
@@ -246,7 +245,7 @@ HTTP_PROXY=http://proxy:port
 HTTPS_PROXY=https://proxy:port
 
 # Domain for links (optional)
-GHOST_LINK_DOMAIN=ghost-vhs.com
+GHOST_LINK_DOMAIN=vhs-ghost.com
 ```
 
 ### MCP Configuration (.mcp.json)

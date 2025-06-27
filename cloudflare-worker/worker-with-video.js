@@ -23,6 +23,92 @@ function escapeHtml(str) {
     .replace(/'/g, '&#x27;');
 }
 
+// Shared constants to eliminate duplication
+const SHARED_ASSETS = {
+  ASCII_ART: `
+   ██████╗ ██╗  ██╗ ██████╗ ███████╗████████╗
+  ██╔════╝ ██║  ██║██╔═══██╗██╔════╝╚══██╔══╝
+  ██║  ███╗███████║██║   ██║███████╗   ██║   
+  ██║   ██║██╔══██║██║   ██║╚════██║   ██║   
+  ╚██████╔╝██║  ██║╚██████╔╝███████║   ██║   
+   ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝`,
+  TAGLINE: 'THE SIGNAL FINDS EVERYONE',
+  VHS_GHOST_SPAN: '<span class="typing glitch" data-text="VHS GHOST">VHS GHOST</span>',
+  SCAN_LINES: '<div class="scanlines"></div>'
+};
+
+// Template functions to reduce duplication
+function createTerminalHTML(content, includeVideoContainer = true) {
+  return `
+    <div class="terminal">
+        ${SHARED_ASSETS.SCAN_LINES}
+        
+        <!-- Terminal content -->
+        <div class="terminal-content">
+            ${content}
+        </div>
+    </div>
+    ${includeVideoContainer ? `
+    <div id="video-loop-container" class="video-loop-container">
+        <video id="video-a" class="loop-video active" playsinline></video>
+        <video id="video-b" class="loop-video" playsinline></video>
+        <button id="mute-toggle" class="mute-button unmuted"></button>
+        <div class="swipe-indicator">SWIPE ↕</div>
+    </div>` : ''}
+    <div class="static-transition"></div>
+  `;
+}
+
+// Consolidated countdown timer function
+function createCountdownTimer(element, duration, options = {}) {
+  const {
+    prefix = '> ',
+    suffix = '',
+    onComplete = null,
+    onTick = null,
+    blinkAt = 5,
+    dangerColor = '#ff0000',
+    normalStyle = 'font-weight: normal;'
+  } = options;
+  
+  let timeLeft = duration;
+  
+  const updateTimer = () => {
+    if (timeLeft >= 0) {
+      // Update display
+      element.innerHTML = `${prefix}<span style="${normalStyle}">${timeLeft}</span>${suffix}`;
+      
+      // Apply danger styles if needed
+      if (timeLeft <= blinkAt && timeLeft > 0) {
+        element.style.animation = 'blink 0.5s infinite';
+        if (timeLeft <= 3) {
+          element.style.color = dangerColor;
+        }
+      }
+      
+      // Call tick callback if provided
+      if (onTick) onTick(timeLeft);
+      
+      if (timeLeft === 0) {
+        // Timer complete
+        if (onComplete) onComplete();
+      } else {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      }
+    }
+  };
+  
+  // Start the timer
+  updateTimer();
+  
+  // Return control object
+  return {
+    stop: () => { timeLeft = -1; },
+    getTimeLeft: () => timeLeft
+  };
+}
+
 // Get user data inside function to avoid global exposure
 function getUserData(username) {
   // Generate a timestamp from 5-30 minutes ago for realism
@@ -525,23 +611,47 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    border-radius: 4px;
 }
 
-/* On desktop with landscape aspect ratio, position mute button outside video */
-@media (min-aspect-ratio: 16/9) {
+/* Desktop positioning - place button next to video */
+@media (min-width: 768px) and (min-aspect-ratio: 16/9) {
     .mute-button {
-        position: fixed;
-        bottom: 20px;
-        transform: none;
-        /* Position to the right of the video frame */
-        right: calc(50% - (100vh * 9 / 16 / 2) - 60px);
+        /* Position at fixed distance from center */
+        /* Video width is 100vh * 9/16 = 56.25vh */
+        /* Half of that is 28.125vh */
+        /* Add padding of 20px */
+        position: absolute;
+        left: calc(50% + 28.125vh + 20px);
+        top: 50%;
+        transform: translateY(-50%);
+        right: auto;
+        bottom: auto;
     }
 }
 
-/* For very wide screens */
-@media (min-aspect-ratio: 21/9) {
+/* For portrait or square screens on desktop */
+@media (min-width: 768px) and (max-aspect-ratio: 16/9) {
     .mute-button {
-        right: calc(50% - min(50vw, 100vh * 9 / 16) / 2 - 60px);
+        /* On narrower screens, position in top right */
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        left: auto;
+        bottom: auto;
+        transform: none;
+    }
+}
+
+/* For portrait/narrow screens, keep button in corner */
+@media (max-aspect-ratio: 9/16) {
+    .mute-button {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        left: auto;
+        top: auto;
+        transform: none;
     }
 }
 
@@ -801,8 +911,9 @@ const VIDEO_TRANSITION_JS = `
     let videoA, videoB;
     let currentVideo = 'A';
     let preloadQueue = [];
-    let isNavigating = false;
     let controlsTimeout = null;
+    let isNavigating = false;
+    let navigationTimeout = null;
     
     // Initialize video queue by fetching chunks
     async function initializeVideoQueue() {
@@ -849,8 +960,18 @@ const VIDEO_TRANSITION_JS = `
         });
         
         // Set up video event listeners
-        videoA.addEventListener('ended', () => navigateNext());
-        videoB.addEventListener('ended', () => navigateNext());
+        videoA.addEventListener('ended', () => {
+            // Only auto-advance if not currently navigating
+            if (!isNavigating && currentVideo === 'A') {
+                navigateNext();
+            }
+        });
+        videoB.addEventListener('ended', () => {
+            // Only auto-advance if not currently navigating
+            if (!isNavigating && currentVideo === 'B') {
+                navigateNext();
+            }
+        });
         
         // Set up navigation
         setupNavigation();
@@ -862,7 +983,6 @@ const VIDEO_TRANSITION_JS = `
     // Navigation functions
     function navigateNext() {
         if (isNavigating) return;
-        isNavigating = true;
         
         currentVideoIndex = (currentVideoIndex + 1) % preloadQueue.length;
         if (currentVideoIndex === 0) {
@@ -871,13 +991,10 @@ const VIDEO_TRANSITION_JS = `
         
         const direction = 'up';
         switchVideosWithDirection(currentVideo === 'A' ? 'B' : 'A', direction);
-        
-        setTimeout(() => { isNavigating = false; }, 500);
     }
     
     function navigatePrev() {
         if (isNavigating) return;
-        isNavigating = true;
         
         currentVideoIndex--;
         if (currentVideoIndex < 0) {
@@ -886,8 +1003,6 @@ const VIDEO_TRANSITION_JS = `
         
         const direction = 'down';
         switchVideosWithDirection(currentVideo === 'A' ? 'B' : 'A', direction);
-        
-        setTimeout(() => { isNavigating = false; }, 500);
     }
     
     // Set up navigation controls
@@ -896,24 +1011,42 @@ const VIDEO_TRANSITION_JS = `
         const swipeIndicator = document.querySelector('.swipe-indicator');
         
         // Scroll wheel navigation for desktop
+        let scrollAccumulator = 0;
         let scrollTimeout;
         let lastScrollTime = 0;
+        const scrollThreshold = 50; // Minimum scroll distance to trigger navigation
+        const scrollDebounceTime = 300; // Minimum time between navigations
         
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
             
-            const now = Date.now();
-            // Debounce scroll events
-            if (now - lastScrollTime < 500) return;
-            lastScrollTime = now;
+            const currentTime = Date.now();
+            const timeSinceLastScroll = currentTime - lastScrollTime;
             
-            if (e.deltaY > 0) {
-                // Scroll down - next video
-                navigateNext();
-            } else if (e.deltaY < 0) {
-                // Scroll up - previous video
-                navigatePrev();
+            // Clear any existing timeout
+            clearTimeout(scrollTimeout);
+            
+            // Accumulate scroll delta
+            scrollAccumulator += e.deltaY;
+            
+            // Check if accumulated scroll exceeds threshold and enough time has passed
+            if (Math.abs(scrollAccumulator) >= scrollThreshold && timeSinceLastScroll > scrollDebounceTime) {
+                if (scrollAccumulator > 0) {
+                    // Scroll down - next video
+                    navigateNext();
+                } else {
+                    // Scroll up - previous video
+                    navigatePrev();
+                }
+                // Reset accumulator and update last scroll time
+                scrollAccumulator = 0;
+                lastScrollTime = currentTime;
             }
+            
+            // Reset accumulator after inactivity
+            scrollTimeout = setTimeout(() => {
+                scrollAccumulator = 0;
+            }, 250);
         }, { passive: false });
         
         // Keyboard navigation
@@ -1000,6 +1133,9 @@ const VIDEO_TRANSITION_JS = `
     
     // Modified switch function with direction
     function switchVideosWithDirection(nextVideoId, direction) {
+        if (isNavigating) return;
+        isNavigating = true;
+        
         const outgoing = nextVideoId === 'A' ? videoB : videoA;
         const incoming = nextVideoId === 'A' ? videoA : videoB;
         
@@ -1032,6 +1168,8 @@ const VIDEO_TRANSITION_JS = `
             incoming.muted = videoA.muted;
             incoming.play().catch(e => {
                 console.error('Video play failed:', e);
+                // Reset navigation state on error
+                isNavigating = false;
                 setTimeout(navigateNext, 100);
             });
             
@@ -1047,10 +1185,25 @@ const VIDEO_TRANSITION_JS = `
                 outgoing.classList.remove('active', 'slide-up', 'slide-down');
                 incoming.classList.remove('slide-in-up', 'slide-in-down');
                 incoming.classList.add('active');
+                
+                // Pause the outgoing video to free resources
+                outgoing.pause();
+                outgoing.currentTime = 0;
+                
                 currentVideo = nextVideoId;
                 
                 // Preload next video
                 preloadAdjacentVideos();
+                
+                // Reset navigation lock after transition completes
+                // Clear any pending navigation timeouts
+                if (navigationTimeout) {
+                    clearTimeout(navigationTimeout);
+                }
+                navigationTimeout = setTimeout(() => {
+                    isNavigating = false;
+                    navigationTimeout = null;
+                }, 100);
             }, 400);
         }
     }
@@ -1463,24 +1616,69 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000);
     
     // Console easter egg
-    console.log(\`
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓
-▓▓░░▓▓▓▓░░▓▓░░▓▓░░▓▓▓▓░░▓▓▓▓░░▓▓▓▓▓░░▓▓
-▓▓░░▓▓░░░░▓▓░░▓▓░░▓▓░▓▓░▓▓░░░░░░▓▓░░░▓▓
-▓▓░░▓▓░▓▓░▓▓▓▓▓▓░░▓▓░▓▓░▓▓▓▓░░░░▓▓░░░▓▓
-▓▓░░▓▓░▓▓░▓▓░░▓▓░░▓▓░▓▓░░░▓▓░░░░▓▓░░░▓▓
-▓▓░░▓▓▓▓░░▓▓░░▓▓░░▓▓▓▓░░▓▓▓▓░░░░▓▓░░░▓▓
-▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-THE SIGNAL FINDS EVERYONE
-    \`);
+    console.log(SHARED_ASSETS.ASCII_ART + '\n\n' + SHARED_ASSETS.TAGLINE);
 });
 `;
 
-// HTML template matching Flask mystery.html exactly with video transitions
-const MYSTERY_HTML = `<!DOCTYPE html>
+// Build mystery HTML using shared templates
+function buildMysteryHTML(username, userData) {
+  const terminalContent = `
+    <div class="header">
+        ${SHARED_ASSETS.VHS_GHOST_SPAN}
+    </div>
+    
+    <div class="data-readout">
+        <div class="terminal-line">
+            <span class="typing">SYSTEM: <span id="system-status">ANALYZING...</span></span>
+        </div>
+        <div class="terminal-line">
+            <span class="typing">PROFILE: <span class="data-value" id="profile-username">@${username}</span></span>
+        </div>
+        <div class="terminal-line">
+            <span class="typing">FOLLOWERS: <span class="data-value" id="followers-count">████████</span></span>
+        </div>
+        <div class="terminal-line">
+            <span class="typing">ENGAGEMENT: <span class="data-value" id="engagement-rate">██.██%</span></span>
+        </div>
+        <div class="terminal-line">
+            <span class="typing">POSTS: <span class="data-value" id="posts-count">███</span></span>
+        </div>
+        <div class="terminal-line">
+            <span class="typing">FOLLOWING: <span class="data-value" id="following-count">████</span></span>
+        </div>
+        <div class="terminal-line">
+            <span class="typing">AVG_LIKES: <span class="data-value" id="avg-likes">█,███</span></span>
+        </div>
+        <div class="terminal-line">
+            <span class="typing">DELIVERED: <span class="data-value" id="delivery-time">█████</span></span>
+        </div>
+        <div class="terminal-line countdown">
+            <span id="countdown-line"></span>
+        </div>
+    </div>
+    
+    <div id="email-section" class="hidden">
+        <div class="prompt">
+            <span>> ENTER_EMAIL_FOR_ACCESS: </span>
+            <div class="input-wrapper">
+                <input 
+                    type="email" 
+                    id="email-input" 
+                    class="terminal-input" 
+                    placeholder="ghost@vhs.com"
+                    autocomplete="off"
+                    spellcheck="false"
+                    maxlength="100"
+                    style="min-width: 250px;"
+                >
+                <span class="block-cursor"></span>
+            </div>
+        </div>
+        <div id="response-message" class="hidden"></div>
+    </div>
+  `;
+  
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1489,64 +1687,21 @@ const MYSTERY_HTML = `<!DOCTYPE html>
     <style>${TERMINAL_CSS}</style>
 </head>
 <body>
-    <div class="terminal">
-        <!-- Scan lines effect -->
-        <div class="scanlines"></div>
-        
-        <!-- Terminal content -->
-        <div class="terminal-content">
-            <div class="header">
-                <span class="typing glitch" data-text="VHS GHOST">VHS GHOST</span>
-            </div>
-            
-            <div class="data-readout" id="data-readout">
-                <!-- Lines will be typed here by JavaScript -->
-            </div>
-            
-            <!-- Store data for JavaScript -->
-            <script type="text/javascript">
-                window.userData = USER_DATA_PLACEHOLDER;
-            </script>
-            
-            <!-- Email collection -->
-            <div class="access-section">
-                <form id="access-form" action="/collect" method="POST">
-                    <div class="prompt">
-                        <span class="email-prompt">&gt; ENTER EMAIL FOR PHASE_2: </span>
-                        <span class="input-wrapper">
-                            <input type="text" name="email" id="email-input" class="terminal-input" 
-                                   placeholder="" required autocomplete="off" autofocus maxlength="200">
-                            <span class="block-cursor" id="cursor"></span>
-                        </span>
-                    </div>
-                </form>
-                <div id="response-message" class="hidden"></div>
-            </div>
-        </div>
-    </div>
+    ${createTerminalHTML(terminalContent)}
     
-    <!--
-    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-    ▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓
-    ▓▓░░▓▓▓▓░░▓▓░░▓▓░░▓▓▓▓░░▓▓▓▓░░▓▓▓▓▓░░▓▓
-    ▓▓░░▓▓░░░░▓▓░░▓▓░░▓▓░▓▓░▓▓░░░░░░▓▓░░░▓▓
-    ▓▓░░▓▓░▓▓░▓▓▓▓▓▓░░▓▓░▓▓░▓▓▓▓░░░░▓▓░░░▓▓
-    ▓▓░░▓▓░▓▓░▓▓░░▓▓░░▓▓░▓▓░░░▓▓░░░░▓▓░░░▓▓
-    ▓▓░░▓▓▓▓░░▓▓░░▓▓░░▓▓▓▓░░▓▓▓▓░░░░▓▓░░░▓▓
-    ▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓
-    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-    THE SIGNAL FINDS EVERYONE
-    -->
-    
+    <script>
+    // Embed user data
+    const userData = ${JSON.stringify(userData)};
+    </script>
     <script>${TERMINAL_JS}</script>
     <script>${VIDEO_TRANSITION_JS}</script>
 </body>
 </html>`;
+}
 
-// Access denied CSS with video transitions
-const ACCESS_DENIED_CSS = `
-${TERMINAL_CSS}
 
+// Additional styles for access denied page
+const ACCESS_DENIED_STYLES = `
 .warning {
     color: #ffff00;
 }
@@ -1579,10 +1734,12 @@ ${TERMINAL_CSS}
 
 // Access denied JS with video transitions
 const ACCESS_DENIED_JS = `
+// Reuse the countdown timer function
+${createCountdownTimer.toString()}
+
 // Add typing effect to lines and countdown
 document.addEventListener('DOMContentLoaded', function() {
     const lines = document.querySelectorAll('.line');
-    let countdownLine = null;
     
     lines.forEach((line, index) => {
         setTimeout(() => {
@@ -1590,16 +1747,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Check if this is the countdown line
             if (line.classList.contains('countdown-line')) {
-                countdownLine = line;
                 // Start countdown after line appears
                 setTimeout(() => {
-                    let timeRemaining = 10;
-                    const countdownInterval = setInterval(() => {
-                        timeRemaining--;
-                        
-                        if (timeRemaining <= 0) {
-                            clearInterval(countdownInterval);
-                            // Trigger video transition instead of showing expired
+                    createCountdownTimer(line, 10, {
+                        prefix: '> ',
+                        suffix: '',
+                        onComplete: () => {
+                            // Trigger video transition
                             if (typeof window.startTransition === 'function') {
                                 window.startTransition();
                             } else if (typeof startTransition === 'function') {
@@ -1608,17 +1762,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 line.style.opacity = '0.3';
                                 line.innerHTML = '<span>> [EXPIRED]</span>';
                             }
-                        } else {
-                            line.innerHTML = '<span class="countdown-text">> ' + 
-                                timeRemaining.toString().padStart(2, '0') + 
-                                '</span>';
-                            
-                            // Subtle dimming as time decreases
-                            if (timeRemaining <= 5) {
-                                line.style.opacity = '0.6';
-                            }
-                        }
-                    }, 1000);
+                        },
+                        blinkAt: -1, // No blinking for access denied
+                        normalStyle: 'font-weight: normal;'
+                    });
                 }, 300); // Start countdown shortly after line appears
             }
         }, index * 100);
@@ -1626,71 +1773,59 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 `;
 
-const ACCESS_DENIED_HTML = `<!DOCTYPE html>
+// Build access denied HTML using shared templates
+function buildAccessDeniedHTML(options = {}) {
+  const { message = 'ACCESS DENIED', timestamp = new Date().toISOString(), username = 'unknown' } = options;
+  
+  const terminalContent = `
+    <div class="header">
+        ${SHARED_ASSETS.VHS_GHOST_SPAN}
+    </div>
+    
+    <div class="data-readout">
+        <div class="line">
+            <span class="warning">&gt; ▓▓▓ INVALID AUTHENTICATION ▓▓▓</span>
+        </div>
+        <div class="line">&nbsp;</div>
+        <div class="line">
+            <span>&gt; TIMESTAMP:</span> <span class="highlight">${timestamp}</span>
+        </div>
+        <div class="line">
+            <span>&gt; ATTEMPTED SUBJECT:</span> <span class="redacted">@${username}</span>
+        </div>
+        <div class="line">
+            <span>&gt; AUTHENTICATION:</span> <span class="warning">FAILED</span>
+        </div>
+        <div class="line countdown-line">
+            <span>&gt; 10</span>
+        </div>
+        <div class="line">&nbsp;</div>
+        <div class="line">
+            <span class="warning">&gt; ${message}</span>
+        </div>
+        <div class="line">&nbsp;</div>
+        <div class="line">
+            <span class="glitch" data-text="&gt; THE SIGNAL IS NOT FOR YOU">&gt; THE SIGNAL IS NOT FOR YOU</span>
+        </div>
+    </div>
+  `;
+  
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ACCESS_DENIED</title>
-    <style>${ACCESS_DENIED_CSS}</style>
+    <style>${TERMINAL_CSS}${ACCESS_DENIED_STYLES}</style>
 </head>
 <body>
-    <div class="terminal">
-        <!-- Scan lines effect -->
-        <div class="scanlines"></div>
-        
-        <!-- Terminal content -->
-        <div class="terminal-content">
-            <div class="header">
-                <span class="typing glitch" data-text="VHS GHOST">VHS GHOST</span>
-            </div>
-            
-            <div class="data-readout">
-                <div class="line">
-                    <span class="warning">&gt; ▓▓▓ INVALID AUTHENTICATION ▓▓▓</span>
-                </div>
-                <div class="line">&nbsp;</div>
-                <div class="line">
-                    <span>&gt; TIMESTAMP:</span> <span class="highlight">{{TIMESTAMP}}</span>
-                </div>
-                <div class="line">
-                    <span>&gt; ATTEMPTED SUBJECT:</span> <span class="redacted">@{{USERNAME}}</span>
-                </div>
-                <div class="line">
-                    <span>&gt; AUTHENTICATION:</span> <span class="warning">FAILED</span>
-                </div>
-                <div class="line countdown-line">
-                    <span>&gt; 10</span>
-                </div>
-                <div class="line">&nbsp;</div>
-                <div class="line">
-                    <span class="warning">&gt; {{MESSAGE}}</span>
-                </div>
-                <div class="line">&nbsp;</div>
-                <div class="line">
-                    <span class="glitch" data-text="&gt; THE SIGNAL IS NOT FOR YOU">&gt; THE SIGNAL IS NOT FOR YOU</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!--
-    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-    ▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓
-    ▓▓░░▓▓▓▓░░▓▓░░▓▓░░▓▓▓▓░░▓▓▓▓░░▓▓▓▓▓░░▓▓
-    ▓▓░░▓▓░░░░▓▓░░▓▓░░▓▓░▓▓░▓▓░░░░░░▓▓░░░▓▓
-    ▓▓░░▓▓░▓▓░▓▓▓▓▓▓░░▓▓░▓▓░▓▓▓▓░░░░▓▓░░░▓▓
-    ▓▓░░▓▓░▓▓░▓▓░░▓▓░░▓▓░▓▓░░░▓▓░░░░▓▓░░░▓▓
-    ▓▓░░▓▓▓▓░░▓▓░░▓▓░░▓▓▓▓░░▓▓▓▓░░░░▓▓░░░▓▓
-    ▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓
-    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-    THE SIGNAL FINDS EVERYONE
-    -->
+    ${createTerminalHTML(terminalContent)}
     
     <script>${ACCESS_DENIED_JS}</script>
     <script>${VIDEO_TRANSITION_JS}</script>
 </body>
 </html>`;
+}
 
 export default {
   async fetch(request, env, ctx) {
@@ -1719,11 +1854,11 @@ export default {
       const timestamp = new Date().toISOString();
       const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
       return new Response(
-        ACCESS_DENIED_HTML
-          .replace(/{{MESSAGE}}/g, 'ACCESS DENIED')
-          .replace(/{{TIMESTAMP}}/g, timestamp)
-          .replace(/{{USERNAME}}/g, escapeHtml('unknown'))
-          .replace(/{{IP}}/g, ip),
+        buildAccessDeniedHTML({ 
+          message: 'ACCESS DENIED', 
+          timestamp, 
+          username: escapeHtml('unknown') 
+        }),
         {
           status: 404,
           headers: { 'Content-Type': 'text/html' },
@@ -2025,11 +2160,11 @@ export default {
       const timestamp = new Date().toISOString();
       const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
       return new Response(
-        ACCESS_DENIED_HTML
-          .replace(/{{MESSAGE}}/g, 'STATUS: NO MATCH IN DATABASE')
-          .replace(/{{TIMESTAMP}}/g, timestamp)
-          .replace(/{{USERNAME}}/g, escapeHtml(sanitizedUsername))
-          .replace(/{{IP}}/g, ip),
+        buildAccessDeniedHTML({ 
+          message: 'STATUS: NO MATCH IN DATABASE', 
+          timestamp, 
+          username: escapeHtml(sanitizedUsername) 
+        }),
         {
           status: 404,
           headers: { 'Content-Type': 'text/html' },
@@ -2055,10 +2190,7 @@ export default {
     };
     
     // Render the page with user data
-    const html = MYSTERY_HTML.replace(
-      'USER_DATA_PLACEHOLDER',
-      JSON.stringify(jsUserData)
-    );
+    const html = buildMysteryHTML(userData.username, jsUserData);
     
     return new Response(html, {
       headers: { 

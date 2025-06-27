@@ -108,11 +108,16 @@ class PersonalizationProcessor:
             ]
             
             logger.info(f"Personalizing chunk for @{username}...")
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            
-            if result.returncode != 0:
-                logger.error(f"FFmpeg error: {result.stderr}")
-                return {"success": False, "message": "Failed to personalize chunk", "error": result.stderr}
+            try:
+                # Add timeout to prevent hanging (60 seconds should be plenty)
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+                
+                if result.returncode != 0:
+                    logger.error(f"FFmpeg error: {result.stderr}")
+                    return {"success": False, "message": "Failed to personalize chunk", "error": result.stderr}
+            except subprocess.TimeoutExpired:
+                logger.error(f"FFmpeg timeout after 60s for chunk {chunk_path.name}")
+                return {"success": False, "message": f"FFmpeg timeout processing chunk {chunk_path.name}"}
             
             # Get file size
             file_size = output_path.stat().st_size / (1024 * 1024)  # MB

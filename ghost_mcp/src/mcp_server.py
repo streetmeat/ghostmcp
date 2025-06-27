@@ -183,7 +183,7 @@ def _send_ghost_video_workflow(username: str, video_path: str,
     Args:
         username: Target Instagram username
         video_path: Path to the video file (can be base clip path)
-        personalized_url: Personalized ghost-vhs.com URL
+        personalized_url: Personalized vhs-ghost.com URL
         message_template: Message template with {username} placeholder
         client: Instagram client instance to use
         preferred_account: Optional preferred account for multi-account mode
@@ -321,10 +321,14 @@ def _send_ghost_video_workflow(username: str, video_path: str,
                         temp_video_path
                     ]
                     
-                    result = subprocess.run(cmd, capture_output=True, text=True)
-                    if result.returncode != 0:
-                        logger.error(f"FFmpeg error: {result.stderr}")
-                        return {"success": False, "message": f"Video personalization failed: {result.stderr}"}
+                    try:
+                        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+                        if result.returncode != 0:
+                            logger.error(f"FFmpeg error: {result.stderr}")
+                            return {"success": False, "message": f"Video personalization failed: {result.stderr}"}
+                    except subprocess.TimeoutExpired:
+                        logger.error(f"FFmpeg timeout after 60s personalizing video")
+                        return {"success": False, "message": "FFmpeg timeout during video personalization"}
             
             # Step 2: Upload video as reel with user tag
             try:
@@ -717,7 +721,7 @@ def create_campaign(
     name: str,
     user_list: List[str],
     video_folder: str = None,
-    message_template: str = "SYSTEM DIAGNOSTIC INITIATED\nACCESS: ghost-vhs.com/{username}\nTIME REMAINING: 72:00:00"
+    message_template: str = "SYSTEM DIAGNOSTIC INITIATED\nACCESS: vhs-ghost.com/{username}\nTIME REMAINING: 72:00:00"
 ) -> Dict[str, Any]:
     """Initialize a new ghost campaign with target users and videos.
     
@@ -1146,11 +1150,26 @@ def download_bright_data_snapshot(snapshot_id: str) -> Dict[str, Any]:
         if download_response.status_code != 200:
             return {"success": False, "message": f"Failed to download snapshot: {download_response.text}"}
         
-        # Parse the data
-        users = download_response.json()
-        
-        if not isinstance(users, list):
-            return {"success": False, "message": "Unexpected data format from snapshot"}
+        # Parse the data - handle both JSON and NDJSON formats
+        try:
+            # First try to parse as regular JSON
+            users = download_response.json()
+            if not isinstance(users, list):
+                return {"success": False, "message": "Unexpected data format from snapshot"}
+        except json.JSONDecodeError as e:
+            # If JSON parsing fails, try NDJSON (newline-delimited JSON)
+            logger.info(f"Regular JSON parsing failed, trying NDJSON format: {str(e)}")
+            users = []
+            for line_num, line in enumerate(download_response.text.strip().split('\n'), 1):
+                if line.strip():  # Skip empty lines
+                    try:
+                        users.append(json.loads(line))
+                    except json.JSONDecodeError as line_error:
+                        logger.error(f"Failed to parse NDJSON line {line_num}: {line_error}")
+                        logger.error(f"Problematic line: {line[:100]}...")  # Log first 100 chars
+            
+            if not users:
+                return {"success": False, "message": "Failed to parse response in either JSON or NDJSON format"}
         
         # Save the data (same format as direct response)
         output_file = Path("datasets") / f"bright_data_users_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
@@ -1748,11 +1767,10 @@ def mark_operation_complete() -> Dict[str, Any]:
     try:
         success = account_pool.mark_operation_complete()
         if success:
-            logger.info("Operation marked complete, account entering cooldown")
+            logger.info("Operation marked complete")
             return {
                 "success": True,
-                "message": "Operation complete, account in cooldown",
-                "cooldown_seconds": account_pool.cooldown_duration
+                "message": "Operation complete"
             }
         else:
             return {
