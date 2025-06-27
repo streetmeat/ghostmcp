@@ -3,7 +3,7 @@ _analogue-slop meets Instagram DM MCP_
 
 ### what is it?
  > a two-part experiment for the @galalabs instagram-dm hackathon.  
- > vhs glitch edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at **vhs-ghost.com**.
+ > vhs glitch edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at a custom domain vhs-ghost.com/username
 
 ### parts
 1. **ghost-mcp-server**  
@@ -13,24 +13,24 @@ _analogue-slop meets Instagram DM MCP_
  > utilises a rotating account pool with proxies  
  > running locally on nvidia jetson nano dev kit
 2. **vhs-ghost.com**  
- > shows your IG stats with a countdown & email collection form  
+ > shows users a custom url with IG stats, email collection & mysterious countdown
  > transitions into an endless feed of vhs clips  
  > cloudflare workers - edge hosted
 
 ### why  
  > fight ai slop with vhs slop
- > celebrate using the technology & internet for creative expression
+ > celebrate using technology & the internet for creative expression
  > opportunity to get introduced to mcp and hackathons 
 
 ### any "actual" use?   
- > with the smallest amount of creativity this could be used to market a product or service
+ > with the smallest amount of creativity this could be pivotd to market a product or service
  > my theory is that combing an obscure vhs clip, editing the actual username, and sending a url with /username it will create enough intrigue for some click through
  
 ### example usage
- > deploy a campagin subagents for  10 random users, create personalized videos for each and dm it to them with a custom urll.
- > personalize a video for user @username, dm it to them with a silly message.  
+ > deploy a campaign using subagents, pick 10 random users, create personalized videos for each and dm it to them with a custom url.
+ > personalize a video for @username, dm it to them with a silly message.  
  > create, list, delete campaigns  
- > create a dataset based on "target user description" with 50 lines  
+ > create a dataset of people in their late 20 to early 30s who follow #nostalgia with a limit of 50 lines.  
 
 ### quick start
 ```bash
