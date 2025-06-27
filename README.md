@@ -23,7 +23,7 @@ _analogue-slop meets Instagram DM MCP_
  > opportunity to get introduced to mcp and hackathons 
 
 ### any "actual" use?   
- > with the smallest amount of creativity this could be pivotd to market a product or service
+ > could be pivotd to market a product or service
  > my theory is that combing an obscure vhs clip, editing the actual username, and sending a url with /username it will create enough intrigue for some click through
  
 ### example usage
