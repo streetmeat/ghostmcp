@@ -1,0 +1,215 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.pyc
+*.pyo
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+*/venv/
+*/ENV/
+*/env/
+*/.venv
+utils/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# Logs
+*.log
+logs/
+*.log.*
+mcp_server.log
+
+# Environment and Credentials
+.env
+.env.*
+*.env
+!.env.example
+accounts.json
+*/accounts.json
+ghost_mcp/accounts.json
+accounts_*.json
+!accounts.json.example
+*_secret*
+*_credential*
+
+# Sessions
+sessions/
+*/sessions/
+ghost_mcp/sessions/
+*.session
+*.json.bak
+
+# Campaign and User Data
+campaigns.json
+*/campaigns.json
+ghost_mcp/campaigns.json
+users_data.json
+*/users_data.json
+emails.txt
+*/emails.txt
+check_emails_api.sh
+user_selection_history.json
+*/user_selection_history.json
+ghost_mcp/user_selection_history.json
+
+# Media Files (but preserve directory structure)
+# Videos
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.flv
+*.wmv
+*.mpg
+*.mpeg
+*.m4v
+
+# Images (except logos)
+*.jpg
+*.jpeg
+*.png
+!gst.png
+!*/gst.png
+*.gif
+*.bmp
+*.tiff
+*.ico
+
+# Audio
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.aac
+
+# Media directories content
+media/raw/*
+media/chunks/*
+media/processed/*
+media/campaign_videos/*
+media/campaign_temp/*
+media/base_clips/*
+*/media/raw/*
+*/media/chunks/*
+*/media/processed/*
+*/media/campaign_videos/*
+*/media/campaign_temp/*
+*/media/base_clips/*
+ghost_mcp/media/raw/*
+ghost_mcp/media/chunks/*
+ghost_mcp/media/processed/*
+ghost_mcp/media/campaign_videos/*
+ghost_mcp/media/campaign_temp/*
+
+# But preserve directory structure
+!media/raw/.gitkeep
+!media/chunks/.gitkeep
+!media/processed/.gitkeep
+!media/campaign_videos/.gitkeep
+!media/campaign_temp/.gitkeep
+!*/media/raw/.gitkeep
+!*/media/chunks/.gitkeep
+!*/media/processed/.gitkeep
+!*/media/campaign_videos/.gitkeep
+!*/media/campaign_temp/.gitkeep
+
+# Datasets
+datasets/*
+!datasets/.gitkeep
+*/datasets/*
+!*/datasets/.gitkeep
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*~
+.DS_Store
+
+# Archive directories
+Old/
+old/
+archive/
+Archive/
+deprecated_backup/
+
+# Configuration files
+config.py
+config.js
+!config.py.example
+!config.js.example
+
+# Cloudflare Worker
+cloudflare-worker/archive/
+cloudflare-worker/.wrangler/
+.wrangler/
+*.wrangler/
+wrangler.toml
+*/wrangler.toml
+!wrangler.toml.example
+
+# Configuration files (keep examples)
+config.py
+*/config.py
+!config.py.example
+config.js
+*/config.js
+!config.js.example
+
+# Documentation (personal dev notes)
+docs/
+*/docs/
+PRD.md
+CLAUDE.md
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test outputs
+test_overlays_advanced/
+test_outputs/
+*.test.mp4
+
+# Misc
+*.db
+*.sqlite
+*.sqlite3
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/

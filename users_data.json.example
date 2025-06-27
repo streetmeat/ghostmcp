@@ -1,0 +1,35 @@
+{
+  "demo_user": {
+    "user_id": "123456789",
+    "full_name": "Demo User",
+    "username": "demo_user",
+    "followers": 1337,
+    "following": 420,
+    "posts_count": 69,
+    "avg_engagement": 0.0723,
+    "biography": "Just a demo account 👻",
+    "profile_pic_url": "https://example.com/pic.jpg",
+    "video_sent": "chunk_001.mp4",
+    "video_sent_at": "2025-06-27T12:00:00Z",
+    "sent_at": "2025-06-27T12:00:00Z",
+    "campaign_id": "demo_campaign",
+    "clicked": false,
+    "clicked_at": null
+  },
+  "example_user-123456": {
+    "user_id": "987654321",
+    "full_name": "Example User",
+    "username": "example_user",
+    "followers": 42069,
+    "following": 666,
+    "posts_count": 420,
+    "avg_engagement": 0.1337,
+    "biography": "Example bio for testing",
+    "video_sent": "chunk_002.mp4",
+    "video_sent_at": "2025-06-27T13:00:00Z",
+    "sent_at": "2025-06-27T13:00:00Z",
+    "campaign_id": "test_campaign",
+    "clicked": true,
+    "clicked_at": "2025-06-27T13:05:00Z"
+  }
+}

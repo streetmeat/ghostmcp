@@ -1,0 +1,33 @@
+{
+  "accounts": [
+    {
+      "username": "your_instagram_username1",
+      "password": "your_instagram_password1",
+      "proxy": "http://proxy_user:proxy_pass@proxy_host:proxy_port",
+      "session_data": null,
+      "last_used": null,
+      "daily_actions": {
+        "send_message": 0,
+        "upload_post": 0,
+        "share_post": 0,
+        "total": 0
+      },
+      "last_action_reset": null
+    },
+    {
+      "username": "your_instagram_username2",
+      "password": "your_instagram_password2",
+      "proxy": null,
+      "session_data": null,
+      "last_used": null,
+      "daily_actions": {
+        "send_message": 0,
+        "upload_post": 0,
+        "share_post": 0,
+        "total": 0
+      },
+      "last_action_reset": null
+    }
+  ],
+  "default_account": "your_instagram_username1"
+}

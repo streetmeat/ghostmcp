@@ -1,0 +1,51 @@
+# Configuration for Ghost Media Haunting Bot - MCP Server
+# Copy this file to config.py and update with your values
+
+# Domain configuration
+GHOST_LINK_DOMAIN = "your-domain.com"
+
+# Default campaign message template
+DEFAULT_MESSAGE_TEMPLATE = (
+    "SYSTEM DIAGNOSTIC INITIATED\n"
+    f"ACCESS: {GHOST_LINK_DOMAIN}/{{username}}\n"
+    "TIME REMAINING: 72:00:00"
+)
+
+# Alternative message templates
+MESSAGE_TEMPLATES = {
+    "cryptic": DEFAULT_MESSAGE_TEMPLATE,
+    "mysterious": (
+        "YOU'VE BEEN SELECTED\n"
+        f"ENTER: {GHOST_LINK_DOMAIN}/{{username}}\n"
+        "EXPIRES: 72 HOURS"
+    ),
+    "urgent": (
+        "URGENT MESSAGE\n"
+        f"VISIT: {GHOST_LINK_DOMAIN}/{{username}}\n"
+        "TIME SENSITIVE"
+    )
+}
+
+# Video processing settings
+VIDEO_CHUNK_DURATION_RANGE = (13, 20)  # seconds
+USERNAME_FLASH_DURATION = 8  # seconds
+GST_LOGO_START_TIME = 7  # seconds
+
+# Campaign batch settings
+DEFAULT_BATCH_SIZE = 10
+DEFAULT_DELAY_SECONDS = 120  # 2 minutes between sends
+
+# Account pool settings (for multi-account mode)
+MAX_DAILY_ACTIONS_PER_ACCOUNT = {
+    "send_message": 50,
+    "upload_post": 10,
+    "share_post": 30,
+    "total": 100
+}
+
+# Bright Data API settings
+BRIGHT_DATA_DEFAULT_FILTERS = {
+    "min_followers": 100,
+    "max_followers": 50000,
+    "default_hashtags": ["nostalgia", "liminalspaces", "backrooms", "vaporwave"]
+}

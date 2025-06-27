@@ -1,0 +1,31 @@
+// Configuration for the Ghost Media Haunting Bot
+// Copy this file to config.js and update with your values
+
+export const CONFIG = {
+  // Domain configuration
+  domain: 'your-domain.com',
+  
+  // URL path for ghost links (e.g., 'ghost.link' or 'your-domain.com')
+  ghostLinkDomain: 'your-domain.com',
+  
+  // Campaign messaging
+  defaultMessageTemplate: 'SYSTEM DIAGNOSTIC INITIATED\nACCESS: {ghostLinkDomain}/{username}\nTIME REMAINING: 72:00:00',
+  
+  // Video transition settings
+  videoTransitionDelay: 45000, // milliseconds before video transition
+  
+  // Demo users (for testing)
+  demoUsers: {
+    "testuser1": {
+      "username": "testuser1",
+      "user_id": "12345678",
+      "followers": 1500,
+      "following": 2000,
+      "posts_count": 500,
+      "avg_engagement": 0.0750,
+      "video_sent": "CHUNK_001",
+      "sent_at": new Date().toISOString(),
+      "clicked": false
+    }
+  }
+};

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "ghost": {
+      "type": "stdio",
+      "command": "ghost_mcp/venv/bin/python",
+      "args": [
+        "ghost_mcp/src/mcp_server.py",
+        "--use-account-pool"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/streetmeat/ghost"
+      }
+    }
+  }
+}

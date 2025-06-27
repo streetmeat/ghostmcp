@@ -1,0 +1,36 @@
+name = "your-worker-name"
+main = "worker-with-video.js"
+compatibility_date = "2024-01-01"
+
+# Default environment KV bindings
+[[kv_namespaces]]
+binding = "USERS_KV"
+id = "YOUR_USERS_KV_NAMESPACE_ID"
+
+[[kv_namespaces]]
+binding = "EMAILS_KV"
+id = "YOUR_EMAILS_KV_NAMESPACE_ID"
+
+[[r2_buckets]]
+binding = "CHUNKS_BUCKET"
+bucket_name = "your-r2-bucket-name"
+
+# Production environment with same KV bindings
+[env.production]
+route = { pattern = "your-domain.com/*", zone_name = "your-domain.com" }
+
+[[env.production.kv_namespaces]]
+binding = "USERS_KV"
+id = "YOUR_USERS_KV_NAMESPACE_ID"
+
+[[env.production.kv_namespaces]]
+binding = "EMAILS_KV"
+id = "YOUR_EMAILS_KV_NAMESPACE_ID"
+
+[[env.production.r2_buckets]]
+binding = "CHUNKS_BUCKET"
+bucket_name = "your-r2-bucket-name"
+
+# Environment variables
+[env.production.vars]
+EMAILS_API_SECRET = "your-secret-key-here"
