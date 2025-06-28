@@ -1,11 +1,19 @@
-vhs-ghost
-analogue-slop meets Instagram DM MCP
+# vhs-ghost
+_analogue-slop meets Instagram DM MCP_
+
 https://github.com/user-attachments/assets/f5c1f086-9c24-4bb3-af58-8adb2724d305
+
+
 <details>
+ 
 <summary>More demo videos</summary>
+ 
 <br>
+ 
 https://github.com/user-attachments/assets/ce39b008-b0ba-45dc-b59b-32e5ce76ac0b
-https://github.com/user-attachments/assets/ebea8689-97a5-427e-9724-8380125a8bed
+
+ https://github.com/user-attachments/assets/ebea8689-97a5-427e-9724-8380125a8bed
+
 </details>
 
 ### what is it?
@@ -100,4 +108,3 @@ python src/mcp_server.py --use-account-pool
 **there's some weird decisions due to the jetson's quirks and my lack of knowledge**  
 **don't trust the code.**
 **yes the mcp_server.py is 2k lines ><**
-
