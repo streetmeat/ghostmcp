@@ -1,19 +1,21 @@
 # vhs-ghost
 _analogue-slop meets Instagram DM MCP_
 
+https://github.com/user-attachments/assets/demo/ex.mp4
+
 ### what is it?
  > a two-part experiment for the @galalabs instagram-dm hackathon.  
- > vhs clips are edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at a custom domain vhs-ghost.com/username
+ > vhs clips are edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at a custom domain [vhs-ghost.com/username](https://vhs-ghost.com/username)
 
 ### parts
 1. **ghost-mcp-server**  
  > pulls targets from brightdata  
  > auto-cuts personalised VHS clips  
- > uploads reel, tags and DMs user with `vhs-ghost.com/<username>`  
+ > uploads reel, tags and DMs user with [`vhs-ghost.com/<username>`](https://vhs-ghost.com/)  
  > utilises a rotating account pool with proxies  
  > running locally on nvidia jetson nano dev kit
 
-2. **vhs-ghost.com**  
+2. **[vhs-ghost.com](https://vhs-ghost.com/)**  
  > the custom url shows the user their IG stats, email collection & mysterious countdown  
  > transitions into an endless feed of vhs clips  
  > cloudflare workers - edge hosted
