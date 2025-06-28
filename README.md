@@ -92,4 +92,5 @@ python src/mcp_server.py --use-account-pool
 
 **there's some weird decisions due to the jetson's quirks and my lack of knowledge**  
 **don't trust the code.**
+**yes the mcp_server.py is 2k lines ><**
 
