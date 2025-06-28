@@ -57,40 +57,91 @@ This reduces processing time from 30-60s to 5-10s per video.
 
 ## Installation & Setup
 
-### System Requirements
-- Python 3.10+ (required)
+### Prerequisites
+- Python 3.10+
 - FFmpeg (for video processing)
+- Git
 - 8GB+ RAM recommended
-- Ubuntu 22.04+ / macOS / Windows
 
-### Quick Start with Virtual Environment (Recommended)
+### Installation
 
+1. **Clone the repository**
 ```bash
-# 1. Clone and enter directory
-cd ghost_mcp
+git clone https://github.com/your-username/ghost-vhs.git
+cd ghost-vhs/ghost_mcp
+```
 
-# 2. Create virtual environment
+2. **Set up Python environment**
+```bash
+# Create virtual environment (recommended)
 python3 -m venv venv
 
-# 3. Activate virtual environment
+# Activate virtual environment
 source venv/bin/activate  # Linux/Mac
 # or
 venv\Scripts\activate  # Windows
 
-# 4. Install dependencies
+# Install dependencies
 pip install -r requirements.txt
-
-# 5. Configure account
-cp .env.example .env
-# Edit .env with your Instagram credentials
-
-# 6. Run the server
-python src/mcp_server.py
 ```
 
-### Multi-Account Setup (Recommended for Production)
+3. **Configure Instagram credentials**
+```bash
+# Copy example files
+cp .env.example .env
+cp accounts.json.example accounts.json
 
-1. Create `accounts.json`:
+# Edit .env with your primary account
+# Edit accounts.json for multi-account setup (optional)
+```
+
+4. **Add to Claude Code**
+
+Using Claude Code CLI:
+```bash
+# Single account mode
+claude mcp add ghost ghost_mcp/venv/bin/python ghost_mcp/src/mcp_server.py
+
+# Multi-account mode (recommended)
+claude mcp add ghost ghost_mcp/venv/bin/python ghost_mcp/src/mcp_server.py --use-account-pool
+```
+
+Or manually add to `.mcp.json`:
+```json
+{
+  "mcpServers": {
+    "ghost": {
+      "type": "stdio",
+      "command": "ghost_mcp/venv/bin/python",
+      "args": ["ghost_mcp/src/mcp_server.py", "--use-account-pool"],
+      "env": {
+        "PYTHONPATH": "/path/to/ghost-vhs"
+      }
+    }
+  }
+}
+```
+
+5. **Verify installation**
+```bash
+# List configured servers
+claude mcp list
+
+# Check server details
+claude mcp get ghost
+```
+
+### Configuration Files
+
+#### .env (Single Account)
+```bash
+INSTAGRAM_USERNAME=your_username
+INSTAGRAM_PASSWORD=your_password
+INSTAGRAM_TOTP_SECRET=optional_2fa_secret  # For 2FA
+GHOST_LINK_DOMAIN=vhs-ghost.com
+```
+
+#### accounts.json (Multi-Account)
 ```json
 {
   "accounts": [
@@ -109,30 +160,6 @@ python src/mcp_server.py
     "session_timeout": 86400,
     "max_daily_actions": 200,
     "rotation_strategy": "round_robin"
-  }
-}
-```
-
-2. Run with account pool:
-```bash
-python src/mcp_server.py --use-account-pool
-```
-
-### Alternative Setup Without Virtual Environment
-
-If you prefer system-wide installation (not recommended):
-
-```bash
-# Install globally
-pip install -r requirements.txt
-
-# Update .mcp.json to use system Python:
-{
-  "mcpServers": {
-    "ghost": {
-      "command": "python3",
-      "args": ["ghost_mcp/src/mcp_server.py", "--use-account-pool"]
-    }
   }
 }
 ```
@@ -231,40 +258,19 @@ for username in users["usernames"][:10]:
     time.sleep(120)
 ```
 
-## Configuration
+## Advanced Configuration
 
-### Environment Variables (.env)
+### Proxy Support
 ```bash
-# Single account mode
-INSTAGRAM_USERNAME=your_username
-INSTAGRAM_PASSWORD=your_password
-INSTAGRAM_TOTP_SECRET=optional_2fa_secret
-
-# Optional proxy
+# In .env or accounts.json
 HTTP_PROXY=http://proxy:port
 HTTPS_PROXY=https://proxy:port
-
-# Domain for links (optional)
-GHOST_LINK_DOMAIN=vhs-ghost.com
 ```
 
-### MCP Configuration (.mcp.json)
-```json
-{
-  "mcpServers": {
-    "ghost": {
-      "type": "stdio",
-      "command": "ghost_mcp/venv/bin/python",
-      "args": [
-        "ghost_mcp/src/mcp_server.py",
-        "--use-account-pool"
-      ],
-      "env": {
-        "PYTHONPATH": "/path/to/ghost"
-      }
-    }
-  }
-}
+### Custom Domain
+```bash
+# In .env
+GHOST_LINK_DOMAIN=your-domain.com
 ```
 
 ## Troubleshooting

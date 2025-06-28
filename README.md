@@ -3,7 +3,7 @@ _analogue-slop meets Instagram DM MCP_
 
 ### what is it?
  > a two-part experiment for the @galalabs instagram-dm hackathon.  
- > vhs glitch edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at a custom domain vhs-ghost.com/username
+ > vhs clips are edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at a custom domain vhs-ghost.com/username
 
 ### parts
 1. **ghost-mcp-server**  
@@ -13,7 +13,7 @@ _analogue-slop meets Instagram DM MCP_
  > utilises a rotating account pool with proxies  
  > running locally on nvidia jetson nano dev kit
 2. **vhs-ghost.com**  
- > shows users a custom url with IG stats, email collection & mysterious countdown
+ > the custom url shows the user their IG stats, email collection & mysterious countdown
  > transitions into an endless feed of vhs clips  
  > cloudflare workers - edge hosted
 
@@ -35,7 +35,7 @@ _analogue-slop meets Instagram DM MCP_
 ### quick start
 ```bash
 # Clone and setup
-git clone <repository-url>
+git clone https://github.com/streetmeat/ghostmcp.git
 cd ghost
 
 # Configure

@@ -89,12 +89,7 @@ class AccountPool:
             # Create client
             client = Client()
             
-            # Set proxy if provided
-            if account_data.get("proxy"):
-                client.set_proxy(account_data["proxy"])
-                logger.info(f"Set proxy for {username}")
-            
-            # Try to load existing session
+            # Try to load existing session first
             session_file = os.path.join(self.sessions_dir, f"{username}.json")
             session_loaded = False
             
@@ -106,6 +101,17 @@ class AccountPool:
                     logger.info(f"Loaded existing session for {username}")
                 except Exception as e:
                     logger.warning(f"Session invalid for {username}, will re-login: {e}")
+            
+            # ALWAYS set proxy if provided (even with existing session)
+            if account_data.get("proxy"):
+                proxy_url = account_data["proxy"]
+                client.set_proxy(proxy_url)
+                logger.info(f"Set proxy for {username}: {proxy_url}")
+                
+                # Verify proxy is applied to the session
+                if hasattr(client, 'private') and hasattr(client.private, 'session'):
+                    session_proxies = client.private.session.proxies
+                    logger.debug(f"Verified session proxies for {username}: {session_proxies}")
             
             # Login if no valid session
             if not session_loaded:
