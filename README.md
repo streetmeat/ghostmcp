@@ -1,4 +1,4 @@
-# ghost-vhs
+# vhs-ghost
 _analogue-slop meets Instagram DM MCP_
 
 ### what is it?
