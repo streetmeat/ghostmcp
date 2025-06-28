@@ -18,13 +18,13 @@ _analogue-slop meets Instagram DM MCP_
  > cloudflare workers - edge hosted
 
 ### why  
- > fight ai slop with vhs slop
- > celebrate using technology & the internet for creative expression
- > opportunity to get introduced to mcp and hackathons 
+ > fight ai slop with vhs slop  
+ > celebrate using technology & the internet for creative expression  
+ > opportunity to get introduced to mcp and hackathons   
 
 ### any "actual" use?   
- > could be pivotd to market a product or service
- > my theory is that combing an obscure vhs clip, editing the actual username, and sending a url with /username it will create enough intrigue for some click through
+ > could be pivotd to market a product or service  
+ > my theory is that combing an obscure vhs clip, editing the actual username, and sending a url with /username it will create enough intrigue for some click through  
  
 ### example usage
  > deploy a campaign using subagents, pick 10 random users, create personalized videos for each and dm it to them with a custom url.
