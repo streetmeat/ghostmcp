@@ -1,7 +1,7 @@
 # vhs-ghost
 _analogue-slop meets Instagram DM MCP_
 
-![Example Ghost Video](demo/ex.mp4)
+[📼 View Example Video](demo/ex.mp4)
 
 ### what is it?
  > a two-part experiment for the @galalabs instagram-dm hackathon.  
