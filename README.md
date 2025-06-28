@@ -12,8 +12,9 @@ _analogue-slop meets Instagram DM MCP_
  > uploads reel + tag & DM with `vhs-ghost.com/<username>`  
  > utilises a rotating account pool with proxies  
  > running locally on nvidia jetson nano dev kit
+
 2. **vhs-ghost.com**  
- > the custom url shows the user their IG stats, email collection & mysterious countdown
+ > the custom url shows the user their IG stats, email collection & mysterious countdown  
  > transitions into an endless feed of vhs clips  
  > cloudflare workers - edge hosted
 
@@ -27,7 +28,7 @@ _analogue-slop meets Instagram DM MCP_
  > my theory is that combing an obscure vhs clip, editing the actual username, and sending a url with /username it will create enough intrigue for some click through  
  
 ### example usage
- > deploy a campaign using subagents, pick 10 random users, create personalized videos for each and dm it to them with a custom url.
+ > deploy a campaign using subagents, pick 10 random users, create personalized videos for each and dm it to them with a custom url.  
  > personalize a video for @username, dm it to them with a silly message.  
  > create, list, delete campaigns  
  > create a dataset of people in their late 20 to early 30s who follow #nostalgia with a limit of 50 lines.  
