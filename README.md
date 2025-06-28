@@ -9,7 +9,7 @@ _analogue-slop meets Instagram DM MCP_
 1. **ghost-mcp-server**  
  > pulls targets from brightdata  
  > auto-cuts personalised VHS clips  
- > uploads reel + tag & DM with `vhs-ghost.com/<username>`  
+ > uploads reel, tags and DMs user with `vhs-ghost.com/<username>`  
  > utilises a rotating account pool with proxies  
  > running locally on nvidia jetson nano dev kit
 
@@ -28,10 +28,10 @@ _analogue-slop meets Instagram DM MCP_
  > my theory is that combing an obscure vhs clip, editing the actual username, and sending a url with /username it will create enough intrigue for some click through  
  
 ### example usage
- > deploy a campaign using subagents, pick 10 random users, create personalized videos for each and dm it to them with a custom url.  
+ > create a campaign with 10 random users, use the use the campaign video tool to create personalized videos, then deploy subagents to upload and dm in parallel. 
  > personalize a video for @username, dm it to them with a silly message.  
- > create, list, delete campaigns  
- > create a dataset of people in their late 20 to early 30s who follow #nostalgia with a limit of 50 lines.  
+ > list all campaigns, delete x campaign, create a campgain. 
+ > create a dataset of people with between 100-1000 followers and follow #nostalgia with a limit of 50 lines. Check every minute for the dataset until it is delievered, dont do anything else. 
 
 ### quick start
 ```bash
