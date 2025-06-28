@@ -3,6 +3,14 @@ _analogue-slop meets Instagram DM MCP_
 
 https://github.com/user-attachments/assets/f5c1f086-9c24-4bb3-af58-8adb2724d305
 
+
+https://github.com/user-attachments/assets/ce39b008-b0ba-45dc-b59b-32e5ce76ac0b
+
+
+
+https://github.com/user-attachments/assets/ebea8689-97a5-427e-9724-8380125a8bed
+
+
 ### what is it?
  > a two-part experiment for the @galalabs instagram-dm hackathon.  
  > vhs clips are edited with your username & a mysterious message tags you in public, slides into your dms, then lures you to a "terminal" at a custom domain [vhs-ghost.com/username](https://vhs-ghost.com/username)
