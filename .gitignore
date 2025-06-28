@@ -92,7 +92,6 @@ ghost_mcp/user_selection_history.json
 *.mpg
 *.mpeg
 *.m4v
-!demo/ex.mp4
 
 # Images (except logos)
 *.jpg
